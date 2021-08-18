@@ -25,6 +25,6 @@ async def on_message(message):
         response = f"Hey there {mention} - {my_message}"
         await message.channel.send(response)
     if message.content.lower == 'micah':
-        emoji = client.get_emoji(868152784594296883)
+        emoji = client.get_emoji('😭')
         await message.add_reaction(emoji)
 client.run(settings.DISCORD_BOT_TOKEN)
