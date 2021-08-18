@@ -9,8 +9,8 @@ async def on_ready():
     print('We have logged in as {0.user}'.format(client))
 
 @client.event
-async def on_message(self, message):
-    if message.author == self.user or message.author.bot:
+async def on_message(message):
+    if message.author == client.user or message.author.bot:
         return
 
     if message.content.startswith('!dadjoke'):
