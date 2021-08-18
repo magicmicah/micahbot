@@ -22,7 +22,7 @@ async def on_message(message):
     if message.content.startswith('!report'):
         my_message = micahbot_functions.report_message()
         mention = message.author.mention
-        response = f"Hey there ${mention} - ${my_message}"
+        response = f"Hey there {mention} - {my_message}"
         await message.channel.send(response)
 
 client.run(settings.DISCORD_BOT_TOKEN)
