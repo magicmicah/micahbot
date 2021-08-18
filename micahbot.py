@@ -5,8 +5,8 @@ import settings
 client = discord.Client()
 
 @client.event
-async def on_ready(self):
-    print(f"We have logged in as {self.user}.")
+async def on_ready():
+    print(f"We have logged in as {0.user}.")
 
 @client.event
 async def on_message(self, message):
