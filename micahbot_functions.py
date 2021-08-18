@@ -25,6 +25,7 @@ def get_dadjoke():
     return(joke_message)
 
 def get_startup_idea():
+
     url = settings.STARTUP_IDEA_URL
     response = requests.get(url)
     idea = response.json()
@@ -32,3 +33,6 @@ def get_startup_idea():
     that = idea['that']
     startup_idea = f"Here's your next startup idea. It's a {this} for {that}"
     return startup_idea
+
+def report_message():
+    return "Freedom of speech - the right to express any opinions without censorship or restraint."

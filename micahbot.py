@@ -19,4 +19,7 @@ async def on_message(message):
     if message.content.startswith('!startupidea'):
         idea = micahbot_functions.get_startup_idea()
         await message.channel.send(idea)
+    if message.content.startswith('!report'):
+        report = micahbot_functions.report_message()
+        await message.channel.send(report)
 client.run(settings.DISCORD_BOT_TOKEN)
