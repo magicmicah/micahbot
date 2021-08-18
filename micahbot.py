@@ -9,7 +9,7 @@ async def on_ready():
     print('We have logged in as {0.user}'.format(client))
 
 @client.event
-async def on_message(message):
+async def on_message(message, guild):
     if message.author == client.user or message.author.bot:
         return
 
@@ -24,5 +24,7 @@ async def on_message(message):
         mention = message.author.mention
         response = f"Hey there {mention} - {my_message}"
         await message.channel.send(response)
-
+    if message.content.lower('micah'):
+        emoji = client.get_emoji(868152784594296883)
+        await message.add_reaction(emoji)
 client.run(settings.DISCORD_BOT_TOKEN)
