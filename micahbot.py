@@ -27,4 +27,7 @@ async def on_message(message):
     if 'micah' in message.content.lower():
         emoji = client.get_emoji(868152784594296883)
         await message.add_reaction(emoji)
+    if 'kamala' in message.content.lower():
+        emoji = client.get_emoji(":2874_kamala_imspeaking:")
+        await message.add_reaction(emoji)
 client.run(settings.DISCORD_BOT_TOKEN)
