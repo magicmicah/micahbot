@@ -5,12 +5,12 @@ import settings
 client = discord.Client()
 
 @client.event
-async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
+async def on_ready(self):
+    print(f"We have logged in as {self.user}.")
 
 @client.event
-async def on_message(message):
-    if message.author == client.user:
+async def on_message(self, message):
+    if message.author == self.user or message.author.bot:
         return
 
     if message.content.startswith('!dadjoke'):
@@ -20,6 +20,9 @@ async def on_message(message):
         idea = micahbot_functions.get_startup_idea()
         await message.channel.send(idea)
     if message.content.startswith('!report'):
-        report = micahbot_functions.report_message()
-        await message.channel.send(report)
+        my_message = micahbot_functions.report_message()
+        mention = message.author.mention
+        response = f"Hey there ${mention} - ${my_message}"
+        await message.channel.send(response)
+
 client.run(settings.DISCORD_BOT_TOKEN)

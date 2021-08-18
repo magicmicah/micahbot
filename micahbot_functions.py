@@ -35,4 +35,4 @@ def get_startup_idea():
     return startup_idea
 
 def report_message():
-    return "Freedom of speech - the right to express any opinions without censorship or restraint."
+    return "We believe in freedom of speech around these parts. Take it up with the person you're reporting."
