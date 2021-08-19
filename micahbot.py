@@ -30,4 +30,7 @@ async def on_message(message):
     if 'kamala' in message.content.lower():
         emoji = client.get_emoji(868149377347239986)
         await message.add_reaction(emoji)
+    if 'inflation' in message.content.lower():
+        emoji = client.get_emoji('https://emoji.gg/assets/emoji/2030-moneyprintergobrrrrr.gif')
+        await message.add_reaction(emoji)
 client.run(settings.DISCORD_BOT_TOKEN)
