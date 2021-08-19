@@ -31,6 +31,11 @@ async def on_message(message):
         emoji = client.get_emoji(868149377347239986)
         await message.add_reaction(emoji)
     if 'inflation' in message.content.lower():
-        emoji = client.get_emoji('https://emoji.gg/assets/emoji/2030-moneyprintergobrrrrr.gif')
-        await message.add_reaction(emoji)
+        biden = client.get_emoji(877705553948852225)
+        moneyprinter = client.get_emoji(877705040842883172)
+        await message.add_reaction(biden)
+        await message.add_reaction(moneyprinter)
+    if 'biden' in message.content.lower():
+        biden = client.get_emoji(877705553948852225)
+        await message.add_reaction(biden)
 client.run(settings.DISCORD_BOT_TOKEN)
