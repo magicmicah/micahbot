@@ -38,4 +38,7 @@ async def on_message(message):
     if 'biden' in message.content.lower():
         biden = client.get_emoji(877705553948852225)
         await message.add_reaction(biden)
+    if 'trump' in message.content.lower():
+        trump = client.get_emoji(877707356492935178)
+        await message.add_reaction(trump)
 client.run(settings.DISCORD_BOT_TOKEN)
