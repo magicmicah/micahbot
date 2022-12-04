@@ -1,18 +1,5 @@
-import discord
 import micahbot_functions
-import settings
-
-client = discord.Client()
-
-@client.event
-async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
-
-@client.event
-async def on_message(message):
-    if message.author == client.user or message.author.bot:
-        return
-
+async def eventloop(message, client):
     if message.content.startswith('!dadjoke'):
         dadjoke = micahbot_functions.get_dadjoke()
         await message.channel.send(dadjoke)
@@ -41,4 +28,3 @@ async def on_message(message):
     if 'trump' in message.content.lower():
         trump = client.get_emoji(877707356492935178)
         await message.add_reaction(trump)
-client.run(settings.DISCORD_BOT_TOKEN)
