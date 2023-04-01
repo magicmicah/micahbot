@@ -1,6 +1,13 @@
 import os
 from os.path import join, dirname
 from dotenv import load_dotenv
+import logging
+
+# Set the logging level and format
+logger = logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
+logger = logging.getLogger(__name__)
+
+logger.info('Completed configuring logger()!') 
 dotenv_file = join(dirname(__file__), '.env')
 load_dotenv(dotenv_file)
 

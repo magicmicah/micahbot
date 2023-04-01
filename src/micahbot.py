@@ -1,22 +1,19 @@
-from discord import Intents
+import discord
 from discord.ext import commands
-from dotenv import load_dotenv
-import openai
-
-from command_logs import CommandLog
-import db
+import logging
+import ai
+import reactions
 import settings
-import micahbot_functions as MF
-import session
+import user_registry as UR
 
-load_dotenv()
+logger = logging.getLogger(__name__)
+logger.info("Starting up...")
 
-db = db.DB(settings.SQLITE_DB_FILE)
-openai.api_key = settings.OPENAI_API_KEY
+registry = UR.UserRegistry()
 
-
-intents = Intents.default()
+intents = discord.Intents.default()
 intents.message_content = True
+intents.members = True
 
 bot = commands.Bot(
     command_prefix="!micahbot",
@@ -24,50 +21,76 @@ bot = commands.Bot(
     intents=intents,
 )
 
+@bot.command()
+async def check(ctx):
+    if isinstance(ctx.channel, discord.channel.DMChannel):
+        await ctx.send("This is a DM channel")
+
+@bot.event
+async def on_member_join(member):
+    registry.add_user(member.id, member.name)
+    for channel in member.guild.channels:
+        if str(channel) == "general":
+            await channel.send(f"""Welcome to the server {member.mention}!""")
+
+@bot.event
+async def on_member_remove(member):
+    registry.remove_user(member.id)
+    for channel in member.guild.channels:
+        if str(channel) == "general":
+            await channel.send(f"""{member.mention} has left the server.""")
+
 @bot.event
 async def on_message(message):
+    
+    nouns = ai.get_nouns(message.content)
+    logger.info(f"Nouns: {nouns}")
+
+    if message.channel is not None:
+        react_ids = reactions.get_react_id(message)
+        if react_ids is not None:
+            for react_id in react_ids:
+                await message.add_reaction(react_id)
+
+    gif_react = reactions.get_gif_react(message)
+    if gif_react is not None:
+        await message.reply(gif_react)    
+
     if message.author == bot.user:
         return
+    
 
     if bot.user in message.mentions:
+
+        user_registered = registry.is_user_in_registry(message.author.id)
+        if user_registered is False and message.author != bot.user:
+            # async with message.channel.typing():
+            #     await message.channel.send(f"Hello {message.author.mention}! By messaging me, you agree to abide by the terms and conditions from OpenAI (https://openai.com/policies/terms-of-use).")
+            registry.add_user(message.author.id, message.author.name)
         
+        clean_message = message.clean_content.replace(f"@MicahBot", "").strip()
         
-        # msg = message.content
-        print(message.clean_content)
+        registry.append_user_message(message.author.id, "user", clean_message)
+
+        user_messages = registry.get_user_messages(message.author.id)
 
         async with message.channel.typing():
 
-            # # Get the last command from the user
-            # last_command = CommandLog.get_last_command(message.author.id)
-            # last_response = CommandLog.get_last_response(message.author.id)
-            # if(last_command is None):
-            #     last_command = ""
-            # if(last_response is None):
-            #     last_response = ""
-            
-            # previous_conversation = last_command + "\n" + last_response
-            clean_message = message.clean_content.replace(f"@MicahBot", "").strip() + " 123!@#" # Add some random characters to the end to make sure the model doesn't just repeat the prompt
-            prompt = f"{clean_message}\n"
-            response = MF.get_openai_completion(prompt=prompt,
-            model="text-davinci-003",
-            max_tokens=4000,
-            temperature=0.5,
-            top_p=1,
-            presence_penalty=0.6,
-            frequency_penalty=0.0,
-            stop=["123!@#"])
 
+            response = ai.get_openai_chat_completion(
+                        model="gpt-3.5-turbo",
+                        messages=user_messages,
+                        user=str(message.author.id))
+            
             if(response is None):
                 final_response = "I don't know what to say to that."
             else:
                 final_response = response
+                registry.append_user_message(message.author.id, "assistant", final_response)
+                #user_messages.append({"role": "assistant", "content": final_response})
 
-            msg = await message.channel.send(final_response)
+            await message.channel.send(final_response)
             
-            user_id = message.author.id
-
-            #CommandLog(user_id, clean_message.replace("123!@#", ""), response)
-            # CommandLog(user_id, "next log", "next response")
 
     await bot.process_commands(message)
 
