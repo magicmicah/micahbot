@@ -32,15 +32,21 @@ async def micahart(ctx, prompt: str = None):
     """Return an image from Replicate AI based on the prompt you provide.
 
     Arguments:
-        prompt (str, optional): The text prompt used to generate the image. 
+        prompt (str, optional): The text prompt used to generate the image.
+            Requires putting prompt in quotes. 
             If no prompt is provided, a message will be sent asking for one.
 
     Returns:
         The generated image.
+
+    Example:
+        !micahart "A beautiful sunset."
     """
+    print(prompt)
     if not prompt:
         await ctx.send("Please provide a prompt to generate an image.")
         return
+
 
     msg = await ctx.send(f"“{prompt}”\n> Generating...")
 
