@@ -27,7 +27,7 @@ class UserRegistry:
             return False
 
     def add_user(self, id, name):
-        new_user = user.User(id, name)
+        new_user = User(id, name)
         new_user.append_message("system", "You are a chatbot. You are here to help people.")
         self.registry[id] = new_user
         self.logger.info(f"User ID: {new_user.id} | User Name: {new_user.name} added to registry.")
