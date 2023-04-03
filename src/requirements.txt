@@ -1,5 +1,6 @@
 discord
 nltk
+openai
 python-dotenv
 replicate
-openai
+requests

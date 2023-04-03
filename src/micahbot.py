@@ -4,27 +4,50 @@ import logging
 import ai
 import reactions
 import settings
-import user_registry as UR
+import user
+import utils
 
 logger = logging.getLogger(__name__)
 logger.info("Starting up...")
 
-registry = UR.UserRegistry()
+registry = user.UserRegistry()
 
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
+help_command = commands.DefaultHelpCommand(show_parameter_descriptions=False)
+
 bot = commands.Bot(
-    command_prefix="!micahbot",
-    description="Runs crazy amount of stuff!",
+    command_prefix="!",
+    description="Micahbot is a fully featured Discord bot that does the needful things.",
     intents=intents,
+    help_command=help_command,
 )
 
+
+
 @bot.command()
-async def check(ctx):
-    if isinstance(ctx.channel, discord.channel.DMChannel):
-        await ctx.send("This is a DM channel")
+async def micahart(ctx, prompt: str = None):
+    """Return an image from Replicate AI based on the prompt you provide.
+
+    Arguments:
+        prompt (str, optional): The text prompt used to generate the image. 
+            If no prompt is provided, a message will be sent asking for one.
+
+    Returns:
+        The generated image.
+    """
+    if not prompt:
+        await ctx.send("Please provide a prompt to generate an image.")
+        return
+
+    msg = await ctx.send(f"“{prompt}”\n> Generating...")
+
+    image = ai.get_replicate_completion(prompt)
+
+    await msg.edit(content=f"“{prompt}”\n{image}")
+
 
 @bot.event
 async def on_member_join(member):
@@ -42,9 +65,6 @@ async def on_member_remove(member):
 
 @bot.event
 async def on_message(message):
-    
-    nouns = ai.get_nouns(message.content)
-    logger.info(f"Nouns: {nouns}")
 
     if message.channel is not None:
         react_ids = reactions.get_react_id(message)
@@ -52,9 +72,14 @@ async def on_message(message):
             for react_id in react_ids:
                 await message.add_reaction(react_id)
 
-    gif_react = reactions.get_gif_react(message)
-    if gif_react is not None:
-        await message.reply(gif_react)    
+    roll_dice = utils.roll_dice(1000)
+    if roll_dice == 1:
+        nouns = ai.get_nouns(message.content)
+        noun_string = " ".join(nouns)
+        gif_react = reactions.get_gif_react(noun_string)
+        logger.info(f"Rolled a 1. Getting a GIF based off: {noun_string}")
+        if gif_react is not None:
+            await message.reply(gif_react)    
 
     if message.author == bot.user:
         return

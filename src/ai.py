@@ -1,6 +1,7 @@
 import settings
 import openai
 import nltk
+import replicate
 
 # download necessary data and packages
 nltk.download('punkt')
@@ -11,6 +12,7 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 
 
+## OpenAI Stuff
 
 def get_openai_completion(prompt, model, temperature, max_tokens, top_p, frequency_penalty, presence_penalty, stop):
     openai.api_key = settings.OPENAI_API_KEY
@@ -30,6 +32,8 @@ def get_openai_chat_completion(model, messages, user):
     except openai.error.APIConnectionError:
         return "I'm having trouble connecting to the internet right now. Try again later."
 
+
+## NLTK Stuff
 ## Find the nouns in a sentence
 def get_nouns(sentence):
     tokens = word_tokenize(sentence)
@@ -38,3 +42,11 @@ def get_nouns(sentence):
     nouns = [word for word, pos in pos_tags if pos.startswith('N')]
 
     return nouns
+
+
+## Replicate Stuff
+
+def get_replicate_completion(prompt):
+    model = replicate.models.get("stability-ai/stable-diffusion")
+    image = model.predict(prompt=prompt)[0]
+    return image
