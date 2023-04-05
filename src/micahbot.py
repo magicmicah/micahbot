@@ -35,13 +35,10 @@ async def on_ready():
 
 @bot.hybrid_command(name="micahart",)
 async def micahart(ctx, prompt: str = None, negative_prompt: str = None):
-    """Return an image from Replicate AI based on the prompt you provide.
+    """Return an image from Replicate AI based on the prompts you provide.
 
     Arguments:
         prompt (str, optional): The text prompt used to generate the image.
-            Requires putting prompt in quotes. 
-            If no prompt is provided, a message will be sent asking for one.
-
         negative_prompt (str, optional): The text prompt used to generate the image.
 
     Returns:
@@ -49,6 +46,7 @@ async def micahart(ctx, prompt: str = None, negative_prompt: str = None):
 
     Example:
         /micahart "A beautiful sunset." "people"
+        https://prompthero.com/stable-diffusion-prompts
     """
     if not prompt:
         await ctx.send("Please provide a prompt to generate an image.")
