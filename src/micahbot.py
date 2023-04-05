@@ -50,7 +50,7 @@ async def micahart(ctx, prompt: str = None):
 
     msg = await ctx.send(f"“{prompt}”\n> Generating...")
 
-    image = ai.get_replicate_completion(prompt)
+    image = ai.get_replicate_image(prompt)
 
     await msg.edit(content=f"“{prompt}”\n{image}")
 

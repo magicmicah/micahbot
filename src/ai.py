@@ -46,7 +46,16 @@ def get_nouns(sentence):
 
 ## Replicate Stuff
 
-def get_replicate_completion(prompt):
-    model = replicate.models.get("stability-ai/stable-diffusion")
-    image = model.predict(prompt=prompt)[0]
-    return image
+def get_replicate_image(prompt):
+
+    model = "stability-ai/stable-diffusion"
+    version = "db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf"
+    model_version = (f"{model}:{version}")
+
+    image = replicate.run(
+        model_version,
+        input={"prompt": prompt}
+    )
+    return image[0]
+
+
