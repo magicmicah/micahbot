@@ -42,23 +42,26 @@ async def micahart(ctx, prompt: str = None, negative_prompt: str = None):
             Requires putting prompt in quotes. 
             If no prompt is provided, a message will be sent asking for one.
 
+        negative_prompt (str, optional): The text prompt used to generate the image.
+
     Returns:
         The generated image.
 
     Example:
-        !micahart "A beautiful sunset."
+        /micahart "A beautiful sunset." "people"
     """
     if not prompt:
         await ctx.send("Please provide a prompt to generate an image.")
         return
 
-
-    msg = await ctx.send(f"“{prompt}”\n> Generating...")
-
-    image = ai.get_replicate_image(prompt, negative_prompt)
-
-    await msg.edit(content=f"“{prompt}”\n{image}")
-
+    if not negative_prompt:
+        msg = await ctx.send(f"Generating...")
+        image = ai.get_replicate_image(prompt, negative_prompt)
+        await msg.edit(content=f"Prompt: {prompt}\n{image}")
+    else:
+        msg = await ctx.send(f"Generating...")
+        image = ai.get_replicate_image(prompt, negative_prompt)
+        await msg.edit(content=f"Prompt: {prompt}\nNegative prompt: {negative_prompt}\n {image}")
 
 @bot.event
 async def on_member_join(member):
