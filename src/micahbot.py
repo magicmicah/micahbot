@@ -12,23 +12,29 @@ logger.info("Starting up...")
 
 registry = user.UserRegistry()
 
-intents = discord.Intents.default()
+intents = discord.Intents.all()
 intents.message_content = True
 intents.members = True
 
 help_command = commands.DefaultHelpCommand(show_parameter_descriptions=False)
 
 bot = commands.Bot(
-    command_prefix="!",
+    command_prefix="/",
     description="Micahbot is a fully featured Discord bot that does the needful things.",
     intents=intents,
     help_command=help_command,
 )
 
 
+@bot.event
+async def on_ready():
+    await bot.change_presence(activity=discord.Game(name="Hacking up some silliness."))
+    await bot.tree.sync()
+    logger.info("Micahbot is ready!")
 
-@bot.command()
-async def micahart(ctx, prompt: str = None):
+
+@bot.hybrid_command(name="micahart",)
+async def micahart(ctx, prompt: str = None, negative_prompt: str = None):
     """Return an image from Replicate AI based on the prompt you provide.
 
     Arguments:
@@ -42,7 +48,6 @@ async def micahart(ctx, prompt: str = None):
     Example:
         !micahart "A beautiful sunset."
     """
-    print(prompt)
     if not prompt:
         await ctx.send("Please provide a prompt to generate an image.")
         return
@@ -50,7 +55,7 @@ async def micahart(ctx, prompt: str = None):
 
     msg = await ctx.send(f"“{prompt}”\n> Generating...")
 
-    image = ai.get_replicate_image(prompt)
+    image = ai.get_replicate_image(prompt, negative_prompt)
 
     await msg.edit(content=f"“{prompt}”\n{image}")
 
