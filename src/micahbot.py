@@ -115,7 +115,7 @@ async def on_message(message):
 
 
             response = ai.get_openai_chat_completion(
-                        model="gpt-3.5-turbo",
+                        model="gpt-4",
                         messages=user_messages,
                         user=str(message.author.id))
             
