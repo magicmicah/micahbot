@@ -130,7 +130,7 @@ async def on_message(message):
                 registry.append_user_message(message.author.id, "assistant", final_response)
                 #user_messages.append({"role": "assistant", "content": final_response})
 
-            await message.channel.send(final_response)
+            await message.reply(final_response)
             
 
     await bot.process_commands(message)
