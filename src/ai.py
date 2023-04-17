@@ -64,3 +64,7 @@ def get_replicate_image(prompt, negative_prompt=None):
     return image[0]
 
 
+
+def check_pc_language(message):
+    if ("hey guys" in message.content.lower()):
+        return "Using 'guys' is not a gender inclusive greeting. Please use 'Hey everyone' or 'Hey all' instead. Thanks!"

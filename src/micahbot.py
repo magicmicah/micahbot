@@ -96,6 +96,10 @@ async def on_message(message):
     if message.author == bot.user:
         return
     
+    if message.guild.id == 700525223790772255:
+        check_message = ai.check_pc_language(message)
+        if check_message is not None:
+            await message.reply(check_message)
 
     if bot.user in message.mentions:
 
@@ -115,7 +119,7 @@ async def on_message(message):
 
 
             response = ai.get_openai_chat_completion(
-                        model="gpt-4",
+                        model="gpt-3.5-turbo",
                         messages=user_messages,
                         user=str(message.author.id))
             
