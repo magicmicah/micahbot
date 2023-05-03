@@ -24,7 +24,7 @@ def get_openai_completion(prompt, model, temperature, max_tokens, top_p, frequen
 
 ## OpenAI Chatbot
 
-def get_openai_chat_completion(model, messages, user):
+async def get_openai_chat_completion(model, messages, user):
     openai.api_key = settings.OPENAI_API_KEY
     try:
         response = openai.ChatCompletion.create(model=model, messages=messages, user=user)
@@ -63,8 +63,6 @@ def get_replicate_image(prompt, negative_prompt=None):
     )
     return image[0]
 
-
-
 def check_pc_language(message):
-    if ("hey guys" in message.content.lower()):
+    if ("hey guys" in message.content.lower() or 'you guys' in message.content.lower()):
         return "Using 'guys' is not a gender inclusive greeting. Please use 'Hey everyone' or 'Hey all' instead. Thanks!"

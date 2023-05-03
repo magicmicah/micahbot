@@ -48,6 +48,7 @@ async def micahart(ctx, prompt: str = None, negative_prompt: str = None):
         /micahart "A beautiful sunset." "people"
         https://prompthero.com/stable-diffusion-prompts
     """
+    logger.info("Micahart invoked by user: " + ctx.author.name)
     if not prompt:
         await ctx.send("Please provide a prompt to generate an image.")
         return
@@ -78,47 +79,25 @@ async def on_member_remove(member):
 @bot.event
 async def on_message(message):
 
-    if message.channel is not None:
-        react_ids = reactions.get_react_id(message)
-        if react_ids is not None:
-            for react_id in react_ids:
-                await message.add_reaction(react_id)
-
-    roll_dice = utils.roll_dice(1000)
-    if roll_dice == 1:
-        nouns = ai.get_nouns(message.content)
-        noun_string = " ".join(nouns)
-        gif_react = reactions.get_gif_react(noun_string)
-        logger.info(f"Rolled a 1. Getting a GIF based off: {noun_string}")
-        if gif_react is not None:
-            await message.reply(gif_react)    
-
     if message.author == bot.user:
         return
-    
-    if message.guild.id == 700525223790772255:
-        check_message = ai.check_pc_language(message)
-        if check_message is not None:
-            await message.reply(check_message)
 
-    if bot.user in message.mentions:
-
+    if isinstance(message.channel, discord.DMChannel):
+        logger.info("DM received from user: " + message.author.name)
         user_registered = registry.is_user_in_registry(message.author.id)
-        if user_registered is False and message.author != bot.user:
-            # async with message.channel.typing():
-            #     await message.channel.send(f"Hello {message.author.mention}! By messaging me, you agree to abide by the terms and conditions from OpenAI (https://openai.com/policies/terms-of-use).")
+        if user_registered is False:
             registry.add_user(message.author.id, message.author.name)
         
-        clean_message = message.clean_content.replace(f"@MicahBot", "").strip()
-        
+        clean_message = message.clean_content.strip()
+
         registry.append_user_message(message.author.id, "user", clean_message)
 
         user_messages = registry.get_user_messages(message.author.id)
 
-        async with message.channel.typing():
+        async with message.author.typing():
 
 
-            response = ai.get_openai_chat_completion(
+            response = await ai.get_openai_chat_completion(
                         model="gpt-3.5-turbo",
                         messages=user_messages,
                         user=str(message.author.id))
@@ -128,10 +107,67 @@ async def on_message(message):
             else:
                 final_response = response
                 registry.append_user_message(message.author.id, "assistant", final_response)
-                #user_messages.append({"role": "assistant", "content": final_response})
+                split_messages = utils.split_string(final_response, 1500)
+                for split_message in split_messages:
+                    await message.reply(split_message)
 
-            await message.reply(final_response)
+    elif isinstance(message.channel, discord.TextChannel):
+        logger.info("TextChannel received from user: " + message.author.name)
+        if message.channel is not None:
+            react_ids = reactions.get_react_id(message)
+            if react_ids is not None:
+                for react_id in react_ids:
+                    await message.add_reaction(react_id)
+
+        roll_dice = utils.roll_dice(1000)
+        if roll_dice == 1:
+            nouns = ai.get_nouns(message.content)
+            noun_string = " ".join(nouns)
+            gif_react = reactions.get_gif_react(noun_string)
+            logger.info(f"Rolled a 1. Getting a GIF based off: {noun_string}")
+            if gif_react is not None:
+                await message.reply(gif_react)    
+        
+        if message.guild.id == 700525223790772255:
+            check_message = ai.check_pc_language(message)
+            if check_message is not None:
+                await message.reply(check_message)
+
+        if bot.user in message.mentions:
+            print("TextChannel")
+
+            user_registered = registry.is_user_in_registry(message.author.id)
+            if user_registered is False and message.author != bot.user:
+                # async with message.channel.typing():
+                #     await message.channel.send(f"Hello {message.author.mention}! By messaging me, you agree to abide by the terms and conditions from OpenAI (https://openai.com/policies/terms-of-use).")
+                registry.add_user(message.author.id, message.author.name)
             
+            clean_message = message.clean_content.replace(f"@MicahBot", "").strip()
+            
+            registry.append_user_message(message.author.id, "user", clean_message)
+
+            user_messages = registry.get_user_messages(message.author.id)
+
+            async with message.channel.typing():
+
+
+                response = await ai.get_openai_chat_completion(
+                                 model="gpt-3.5-turbo",
+                                 messages=user_messages,
+                                 user=str(message.author.id))
+                
+                if(response is None):
+                    final_response = "I don't know what to say to that."
+                else:
+                    final_response = response
+                    registry.append_user_message(message.author.id, "assistant", final_response)
+                    split_messages = utils.split_string(final_response, 1500)
+
+
+                
+                    for split_message in split_messages:
+                        await message.reply(split_message)
+                
 
     await bot.process_commands(message)
 
