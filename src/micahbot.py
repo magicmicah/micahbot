@@ -55,11 +55,11 @@ async def micahart(ctx, prompt: str = None, negative_prompt: str = None):
 
     if not negative_prompt:
         msg = await ctx.send(f"Generating...")
-        image = ai.get_replicate_image(prompt, negative_prompt)
+        image = await ai.get_replicate_image(prompt, negative_prompt)
         await msg.edit(content=f"Prompt: {prompt}\n{image}")
     else:
         msg = await ctx.send(f"Generating...")
-        image = ai.get_replicate_image(prompt, negative_prompt)
+        image = await ai.get_replicate_image(prompt, negative_prompt)
         await msg.edit(content=f"Prompt: {prompt}\nNegative prompt: {negative_prompt}\n {image}")
 
 @bot.event
