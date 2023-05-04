@@ -32,7 +32,7 @@ async def get_openai_chat_completion(model, messages, user):
     openai.api_key = settings.OPENAI_API_KEY
 
     try:
-        response = openai.ChatCompletion.create(model=model, messages=messages, user=user, max_tokens=max_tokens)
+        response = openai.ChatCompletion.create(model=model, messages=messages, user=user)
         return response['choices'][0]['message']['content']
     except openai.error.APIConnectionError:
         logger.info("API Connection Error")
