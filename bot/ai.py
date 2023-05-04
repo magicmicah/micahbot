@@ -28,7 +28,7 @@ def get_openai_completion(prompt, model, temperature, max_tokens, top_p, frequen
 
 ## OpenAI Chatbot
 
-async def get_openai_chat_completion(model, messages, user, max_tokens=100):
+async def get_openai_chat_completion(model, messages, user, max_tokens=4096):
     openai.api_key = settings.OPENAI_API_KEY
 
     try:
