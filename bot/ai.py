@@ -2,6 +2,10 @@ import settings
 import openai
 import nltk
 import replicate
+import tiktoken
+import logging
+
+logger = logging.getLogger(__name__)
 
 # download necessary data and packages
 nltk.download('punkt')
@@ -24,14 +28,22 @@ def get_openai_completion(prompt, model, temperature, max_tokens, top_p, frequen
 
 ## OpenAI Chatbot
 
-async def get_openai_chat_completion(model, messages, user):
+async def get_openai_chat_completion(model, messages, user, max_tokens=100):
     openai.api_key = settings.OPENAI_API_KEY
+
     try:
-        response = openai.ChatCompletion.create(model=model, messages=messages, user=user)
+        response = openai.ChatCompletion.create(model=model, messages=messages, user=user, max_tokens=max_tokens)
         return response['choices'][0]['message']['content']
     except openai.error.APIConnectionError:
+        logger.info("API Connection Error")
         return "I'm having trouble connecting to the internet right now. Try again later."
 
+
+def num_characters_from_messages(messages):
+    content_length_sum = 0
+    for item in messages:
+        content_length_sum += len(item['content'])
+    return content_length_sum
 
 ## NLTK Stuff
 ## Find the nouns in a sentence
@@ -66,3 +78,5 @@ async def get_replicate_image(prompt, negative_prompt=None):
 def check_pc_language(message):
     if ("hey guys" in message.content.lower() or 'you guys' in message.content.lower()):
         return "Using 'guys' is not a gender inclusive greeting. Please use 'Hey everyone' or 'Hey all' instead. Thanks!"
+    
+

@@ -107,18 +107,19 @@ async def on_message(message):
             else:
                 final_response = response
                 registry.append_user_message(message.author.id, "assistant", final_response)
-                split_messages = utils.split_string(final_response, 1500)
+                split_messages = utils.split_string(final_response)
                 for split_message in split_messages:
                     await message.reply(split_message)
 
     elif isinstance(message.channel, discord.TextChannel):
-        logger.info("TextChannel received from user: " + message.author.name)
+        # Add reactions to messages
         if message.channel is not None:
             react_ids = reactions.get_react_id(message)
             if react_ids is not None:
                 for react_id in react_ids:
                     await message.add_reaction(react_id)
-
+        
+        # Random chance to get a GIF reaction
         roll_dice = utils.roll_dice(1000)
         if roll_dice == 1:
             nouns = ai.get_nouns(message.content)
@@ -128,45 +129,47 @@ async def on_message(message):
             if gif_react is not None:
                 await message.reply(gif_react)    
         
+        # Check for PC language in this guild only
         if message.guild.id == 700525223790772255:
             check_message = ai.check_pc_language(message)
             if check_message is not None:
                 await message.reply(check_message)
 
+        # If bot is mentioned, respond
         if bot.user in message.mentions:
-            print("TextChannel")
-
+            logger.info("TextChannel received from user: " + message.author.name)
             user_registered = registry.is_user_in_registry(message.author.id)
             if user_registered is False and message.author != bot.user:
                 # async with message.channel.typing():
                 #     await message.channel.send(f"Hello {message.author.mention}! By messaging me, you agree to abide by the terms and conditions from OpenAI (https://openai.com/policies/terms-of-use).")
                 registry.add_user(message.author.id, message.author.name)
             
-            clean_message = message.clean_content.replace(f"@MicahBot", "").strip()
-            
-            registry.append_user_message(message.author.id, "user", clean_message)
-
-            user_messages = registry.get_user_messages(message.author.id)
-
-            async with message.channel.typing():
-
-
-                response = await ai.get_openai_chat_completion(
-                                 model="gpt-3.5-turbo",
-                                 messages=user_messages,
-                                 user=str(message.author.id))
+            if ("where is" in message.content.lower()):
+                await message.reply("I don't know where anything is. I'm just a bot.")
+                return
+            else:
+                clean_message = message.clean_content.replace(f"@MicahBot", "").strip()
                 
-                if(response is None):
-                    final_response = "I don't know what to say to that."
-                else:
-                    final_response = response
-                    registry.append_user_message(message.author.id, "assistant", final_response)
-                    split_messages = utils.split_string(final_response, 1500)
+                registry.append_user_message(message.author.id, "user", clean_message)
+
+                user_messages = registry.get_user_messages(message.author.id)
+
+                async with message.channel.typing():
 
 
-                
-                    for split_message in split_messages:
-                        await message.reply(split_message)
+                    response = await ai.get_openai_chat_completion(
+                                    model="gpt-3.5-turbo",
+                                    messages=user_messages,
+                                    user=str(message.author.id))
+                    
+                    if(response is None):
+                        final_response = "I don't know what to say to that."
+                    else:
+                        final_response = response
+                        registry.append_user_message(message.author.id, "assistant", final_response)
+                        split_messages = utils.split_string(final_response)                    
+                        for split_message in split_messages:
+                            await message.reply(split_message)
                 
 
     await bot.process_commands(message)
