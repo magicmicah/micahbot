@@ -6,7 +6,7 @@ import reactions
 import settings
 import user
 import utils
-
+import typing
 logger = logging.getLogger(__name__)
 logger.info("Starting up...")
 
@@ -32,14 +32,12 @@ async def on_ready():
     await bot.tree.sync()
     logger.info("Micahbot is ready!")
 
-
 @bot.hybrid_command(name="micahart",)
-async def micahart(ctx, prompt: str = None, negative_prompt: str = None):
+async def micahart(ctx, model: typing.Literal['openai', 'replicate'], prompt: str = None):
     """Return an image from Replicate AI based on the prompts you provide.
 
     Arguments:
         prompt (str, optional): The text prompt used to generate the image.
-        negative_prompt (str, optional): The text prompt used to generate the image.
 
     Returns:
         The generated image.
@@ -53,14 +51,12 @@ async def micahart(ctx, prompt: str = None, negative_prompt: str = None):
         await ctx.send("Please provide a prompt to generate an image.")
         return
 
-    if not negative_prompt:
-        msg = await ctx.send(f"Generating...")
-        image = await ai.get_replicate_image(prompt, negative_prompt)
-        await msg.edit(content=f"Prompt: {prompt}\n{image}")
-    else:
-        msg = await ctx.send(f"Generating...")
-        image = await ai.get_replicate_image(prompt, negative_prompt)
-        await msg.edit(content=f"Prompt: {prompt}\nNegative prompt: {negative_prompt}\n {image}")
+    msg = await ctx.send(f"Generating {prompt}...")
+    if model == "openai":
+        image = await ai.get_openai_image(prompt)
+    elif model == "replicate":
+        image = await ai.get_replicate_image(prompt)
+    await msg.edit(content=f"Prompt: {prompt}\n {image}")
 
 @bot.event
 async def on_member_join(member):

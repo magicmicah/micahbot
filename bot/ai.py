@@ -38,6 +38,15 @@ async def get_openai_chat_completion(model, messages, user):
         logger.info("API Connection Error")
         return "I'm having trouble connecting to the internet right now. Try again later."
 
+async def get_openai_image(prompt):
+    openai.api_key = settings.OPENAI_API_KEY
+    try:
+        response = openai.Image.create(prompt=prompt, n=1, size="512x512")
+        return response['data'][0]['url']
+    except openai.error.APIConnectionError:
+        return "I'm having trouble connecting to the internet right now. Try again later."
+    except openai.error.InvalidRequestError:
+        return "Your request was rejected as a result of our safety system. Please recheck your prompt."
 
 def num_characters_from_messages(messages):
     content_length_sum = 0
