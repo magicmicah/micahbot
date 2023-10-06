@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import logging
+import re
 import ai
 import reactions
 import settings
@@ -57,6 +58,44 @@ async def micahart(ctx, model: typing.Literal['openai', 'replicate'], prompt: st
     elif model == "replicate":
         image = await ai.get_replicate_image(prompt)
     await msg.edit(content=f"Prompt: {prompt}\n {image}")
+
+@bot.hybrid_command(name="micahroll",)
+async def micahroll(ctx, dice: str = None):
+    """Roll a dice.
+
+    Arguments:
+        dice (str, optional): The dice to roll.
+
+    Returns:
+        The result of the dice roll.
+
+    Example:
+        /micahroll 1d20
+    """
+    logger.info("Micahroll invoked by user: " + ctx.author.name)
+    if not dice:
+        await ctx.send("Please provide a dice to roll. Example: 1d20")
+        return
+
+    # parse dice string - 1d20, 2d6, etc.
+    pattern = r'(\d+)d(\d+)'  # 1d20, 2d6, etc.
+    match = re.match(pattern, dice)
+    if match is None:
+        await ctx.send(f"Invalid dice: {dice}")
+        return
+    num_dice = int(match.group(1))
+    num_sides = int(match.group(2))
+    if num_dice < 1 or num_dice > 5:
+        await ctx.send(f"Invalid number of dice: {num_dice}")
+        return
+    if num_sides < 1 or num_sides > 20:
+        await ctx.send(f"Invalid number of sides: {num_sides}")
+        return
+    
+    msg = await ctx.send(f"Rolling {dice}...")
+    rolls = [utils.random_number(1, num_sides) for _ in range(num_dice)]
+    result = sum(rolls)
+    await msg.edit(content=f"Rolling {dice}...\nGot: {result}\nRolls: {rolls}")
 
 @bot.event
 async def on_member_join(member):
@@ -116,8 +155,8 @@ async def on_message(message):
                     await message.add_reaction(react_id)
         
         # Random chance to get a GIF reaction
-        roll_dice = utils.roll_dice(1000)
-        if roll_dice == 1:
+        number = utils.random_number(1, 1000)
+        if number == 1:
             nouns = ai.get_nouns(message.content)
             noun_string = " ".join(nouns)
             gif_react = reactions.get_gif_react(noun_string)
