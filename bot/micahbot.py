@@ -95,7 +95,7 @@ async def micahroll(ctx, dice: str = None):
     msg = await ctx.send(f"Rolling {dice}...")
     rolls = [utils.random_number(1, num_sides) for _ in range(num_dice)]
     result = sum(rolls)
-    await msg.edit(content=f"Rolling {dice}...\nRolls: {rolls}\Result: {result}")
+    await msg.edit(content=f"Rolling {dice}...\nRolls: {rolls}\nResult: {result}")
 
 @bot.event
 async def on_member_join(member):
