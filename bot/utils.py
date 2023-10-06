@@ -1,8 +1,11 @@
 import random
 import tiktoken
 
-def roll_dice(sides):
+def roll_dice(dice, sides):
     return random.randint(1, sides)
+
+def random_number(min, max):
+    return random.randint(min, max)
 
 def split_string(str, max_length=1800):
     '''Takes a string and splits it into a list where each item in the list is no more than 1800 characters and ends on a sentence boundary'''
