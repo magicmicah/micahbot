@@ -61,7 +61,7 @@ async def micahart(ctx, model: typing.Literal['openai', 'replicate'], prompt: st
 
 @bot.hybrid_command(name="micahroll",)
 async def micahroll(ctx, dice: str = None):
-    """Roll a dice.
+    """Roll a dice or two. Ex. /micahroll 1d20
 
     Arguments:
         dice (str, optional): The dice to roll.
